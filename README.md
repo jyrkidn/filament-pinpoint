@@ -15,6 +15,7 @@
 - ✋ **Draggable marker** - Drag the marker to fine-tune the location
 - 📱 **Current location** - Get user's current device location
 - 🏠 **Reverse geocoding** - Auto-fill address fields from coordinates
+- 🌙 **Dark mode support** - Fully compatible with Filament's dark mode
 - ⚙️ **Fully configurable** - Customize height, zoom, default location, and more
 
 ## Requirements
