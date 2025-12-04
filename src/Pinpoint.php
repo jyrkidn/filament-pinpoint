@@ -54,11 +54,19 @@ class Pinpoint extends Field
             if ($record) {
                 $latField = $component->getLatField();
                 $lngField = $component->getLngField();
+                $addressField = $component->getAddressField();
 
-                $component->state([
+                $state = [
                     'lat' => $record->{$latField} ?? $component->getDefaultLat(),
                     'lng' => $record->{$lngField} ?? $component->getDefaultLng(),
-                ]);
+                ];
+
+                // Tambahkan address ke state jika field dikonfigurasi
+                if ($addressField && isset($record->{$addressField})) {
+                    $state['address'] = $record->{$addressField};
+                }
+
+                $component->state($state);
             }
         });
 

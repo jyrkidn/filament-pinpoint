@@ -26,6 +26,7 @@
         $state = $getState();
         $currentLat = $state['lat'] ?? $defaultLat;
         $currentLng = $state['lng'] ?? $defaultLng;
+        $currentAddress = $state['address'] ?? '';
     @endphp
 
     <div
@@ -34,8 +35,9 @@
             map: null,
             marker: null,
             searchBox: null,
-            lat: @js($currentLat),
-            lng: @js($currentLng),
+            lat: parseFloat(@js($currentLat)) || @js($defaultLat),
+            lng: parseFloat(@js($currentLng)) || @js($defaultLng),
+            address: @js($currentAddress),
             defaultLat: @js($defaultLat),
             defaultLng: @js($defaultLng),
             defaultZoom: @js($defaultZoom),
@@ -174,10 +176,8 @@
                     if (status === 'OK' && results[0]) {
                         const address = results[0].formatted_address;
 
-                        // Update search input di map picker
-                        if (this.$refs.searchInput) {
-                            this.$refs.searchInput.value = address;
-                        }
+                        // Update address variable (untuk x-model)
+                        this.address = address;
 
                         // Update alamat field jika di-set
                         if (this.addressField) {
@@ -243,6 +243,7 @@
                 <input
                     type="text"
                     x-ref="searchInput"
+                    x-model="address"
                     placeholder="Search for a location..."
                     style="display: block; width: 100%; padding: 10px 16px 10px 40px; font-size: 14px; border-radius: 8px; outline: none;"
                     class="border bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20"
