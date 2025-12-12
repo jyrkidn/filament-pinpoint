@@ -20,7 +20,11 @@
         $latField = $getLatField();
         $lngField = $getLngField();
         $addressField = $getAddressField();
+        $provinceField = $getProvinceField();
         $villageField = $getVillageField();
+        $cityField = $getCityField();
+        $districtField = $getDistrictField();
+        $postalCodeField = $getPostalCodeField();
         $apiKey = $getApiKey();
 
         $state = $getState();
@@ -46,6 +50,10 @@
             latField: @js($latField),
             lngField: @js($lngField),
             addressField: @js($addressField),
+            provinceField: @js($provinceField),
+            cityField: @js($cityField),
+            districtField: @js($districtField),
+            postalCodeField: @js($postalCodeField),
             villageField: @js($villageField),
             isMapLoaded: false,
 
@@ -164,7 +172,7 @@
                     $wire.set('data.' + this.lngField, this.lng);
                 }
 
-                // Reverse geocoding untuk dapat alamat
+                // Reverse geocoding to get address
                 this.reverseGeocode(lat, lng);
             },
 
@@ -176,29 +184,73 @@
                     if (status === 'OK' && results[0]) {
                         const address = results[0].formatted_address;
 
-                        // Update address variable (untuk x-model)
+                        // Update address variable (for x-model)
                         this.address = address;
 
-                        // Update alamat field jika di-set
+                        // Update field address if set
                         if (this.addressField) {
                             $wire.set('data.' + this.addressField, address);
                         }
 
-                        // Coba extract district/village dari address components
+                        // Extract address components
                         const components = results[0].address_components;
+                        let province = '';
+                        let city = '';
+                        let district = '';
                         let village = '';
+                        let postalCode = '';
 
                         components.forEach(component => {
-                            // Desa/Kelurahan biasanya di administrative_area_level_4 atau sublocality
+                            // Province
+                            if (component.types.includes('administrative_area_level_1')) {
+                                province = component.long_name;
+                            }
+
+                            // City/County
+                            if (component.types.includes('administrative_area_level_2')) {
+                                city = component.long_name;
+                            }
+
+                            // District
+                            if (component.types.includes('administrative_area_level_3')) {
+                                district = component.long_name;
+                            }
+
+                            // Villages/Sub-districts are usually at administrative_area_level_4 or sublocality
                             if (component.types.includes('administrative_area_level_4') ||
                                 component.types.includes('sublocality_level_1')) {
                                 village = component.long_name.replace(/^(Desa|Kelurahan)\s*/i, '');
                             }
+
+                            // Postal code/Zip code
+                            if (component.types.includes('postal_code')) {
+                                postalCode = component.long_name;
+                            }
                         });
 
-                        // Update village jika ditemukan dan field di-set
+                        // Update province if found and field is set
+                        if (province && this.provinceField) {
+                            $wire.set('data.' + this.provinceField, province || null);
+                        }
+                        
+                        // Update city if found and field is set
+                        if (city && this.cityField) {
+                            $wire.set('data.' + this.cityField, city || null);
+                        }
+                        
+                        // Update district if found and field is set
+                        if (district && this.districtField) {
+                            $wire.set('data.' + this.districtField, district || null);
+                        }
+
+                        // Update village if found and field is set
                         if (village && this.villageField) {
-                            $wire.set('data.' + this.villageField, village);
+                            $wire.set('data.' + this.villageField, village || null);
+                        }
+
+                        // Update postalCode if found and field is set
+                        if (postalCode && this.postalCodeField) {
+                            $wire.set('data.' + this.postalCodeField, postalCode || null);
                         }
                     }
                 });
@@ -274,11 +326,11 @@
                 type="button"
                 x-on:click="getCurrentLocation()"
                 x-show="isMapLoaded"
-                style="position: absolute; bottom: 16px; right: 16px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 10px; border: none; cursor: pointer;"
+                style="position: absolute; bottom: 75px; right: 10px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 10px; border: none; cursor: pointer;"
                 class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 title="Use my location"
             >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;" class="text-primary-600 dark:text-primary-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 21px;" class="text-primary-600 dark:text-primary-400">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                 </svg>
