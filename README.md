@@ -108,13 +108,14 @@ Pinpoint::make('location')
     ->searchable()
     ->latField('lat')
     ->lngField('lng')
-    ->addressField('address')           // Auto-fill address field
+    ->addressField('address')            // Auto-fill address field
     ->shortAddressField('short_address') // Auto-fill short address field (exclude province, city, district, village, and postal code)
-    ->provinceField('province')         // Auto-fill province field
-    ->cityField('city')                 // Auto-fill city/county field
-    ->districtField('district')         // Auto-fill district field
-    ->villageField('village')           // Auto-fill village/district field
-    ->postalCodeField('postal_code')    // Auto-fill postal/zip code field
+    ->provinceField('province')          // Auto-fill province field
+    ->cityField('city')                  // Auto-fill city/county field
+    ->districtField('district')          // Auto-fill district field
+    ->villageField('village')            // Auto-fill village/district field
+    ->postalCodeField('postal_code')     // Auto-fill postal/zip code field
+    ->countryField('country')            // Auto-fill country field
     ->columnSpanFull()
 ```
 
