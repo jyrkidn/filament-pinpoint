@@ -20,11 +20,13 @@
         $latField = $getLatField();
         $lngField = $getLngField();
         $addressField = $getAddressField();
+        $shortAddressField = $getShortAddressField();
         $provinceField = $getProvinceField();
         $villageField = $getVillageField();
         $cityField = $getCityField();
         $districtField = $getDistrictField();
         $postalCodeField = $getPostalCodeField();
+        $countryField = $getCountryField();
         $apiKey = $getApiKey();
 
         $state = $getState();
@@ -50,10 +52,12 @@
             latField: @js($latField),
             lngField: @js($lngField),
             addressField: @js($addressField),
+            shortAddressField: @js($shortAddressField),
             provinceField: @js($provinceField),
             cityField: @js($cityField),
             districtField: @js($districtField),
             postalCodeField: @js($postalCodeField),
+            countryField: @js($countryField),
             villageField: @js($villageField),
             isMapLoaded: false,
 
@@ -194,13 +198,38 @@
 
                         // Extract address components
                         const components = results[0].address_components;
+                        let subpremise = '';
+                        let premise = '';
+                        let streetNumber = '';
+                        let route = '';
                         let province = '';
                         let city = '';
                         let district = '';
                         let village = '';
                         let postalCode = '';
+                        let country = '';
 
                         components.forEach(component => {
+                            // Street Number
+                            if (component.types.includes('street_number')) {
+                                streetNumber = component.long_name;
+                            }
+
+                            // Subpremise
+                            if (component.types.includes('subpremise')) {
+                                subpremise = component.long_name;
+                            }
+
+                            // Premise
+                            if (component.types.includes('premise')) {
+                                premise = component.long_name;
+                            }
+
+                            // Route
+                            if (component.types.includes('route')) {
+                                route = component.long_name;
+                            }
+
                             // Province
                             if (component.types.includes('administrative_area_level_1')) {
                                 province = component.long_name;
@@ -226,7 +255,33 @@
                             if (component.types.includes('postal_code')) {
                                 postalCode = component.long_name;
                             }
+                            
+                            // Country
+                            if (component.types.includes('country')) {
+                                country = component.long_name;
+                            }
                         });
+
+                        // Build short address
+                        let shortAddress = '';
+                        if (subpremise) {
+                            shortAddress += subpremise + ', ';
+                        }
+                        if (premise) {
+                            shortAddress += premise + ', ';
+                        }
+                        if (route && streetNumber) {
+                            shortAddress += `${route} ${streetNumber}`;
+                        } else if (route) {
+                            shortAddress += route;
+                        } else if (streetNumber) {
+                            shortAddress += streetNumber;
+                        }
+
+                        // Update short address
+                        if (this.shortAddressField) {
+                            $wire.set('data.' + this.shortAddressField, shortAddress || null);
+                        }
 
                         // Update province - set null if API returns no data
                         if (this.provinceField) {
@@ -251,6 +306,11 @@
                         // Update postalCode - set null if API returns no data
                         if (this.postalCodeField) {
                             $wire.set('data.' + this.postalCodeField, postalCode || null);
+                        }
+
+                        // Update country - set null if API returns no data
+                        if (this.countryField) {
+                            $wire.set('data.' + this.countryField, country || null);
                         }
                     }
                 });
