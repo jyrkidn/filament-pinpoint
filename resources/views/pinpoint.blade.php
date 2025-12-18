@@ -21,6 +21,8 @@
         $lngField = $getLngField();
         $addressField = $getAddressField();
         $shortAddressField = $getShortAddressField();
+        $streetField = $getStreetField();
+        $streetNumberField = $getStreetNumberField();
         $provinceField = $getProvinceField();
         $villageField = $getVillageField();
         $cityField = $getCityField();
@@ -53,6 +55,8 @@
             lngField: @js($lngField),
             addressField: @js($addressField),
             shortAddressField: @js($shortAddressField),
+            streetField: @js($streetField),
+            streetNumberField: @js($streetNumberField),
             provinceField: @js($provinceField),
             cityField: @js($cityField),
             districtField: @js($districtField),
@@ -255,7 +259,7 @@
                             if (component.types.includes('postal_code')) {
                                 postalCode = component.long_name;
                             }
-                            
+
                             // Country
                             if (component.types.includes('country')) {
                                 country = component.long_name;
@@ -281,6 +285,14 @@
                         // Update short address
                         if (this.shortAddressField) {
                             $wire.set('data.' + this.shortAddressField, shortAddress || null);
+                        }
+
+                        if (this.streetField) {
+                            $wire.set('data.' + this.streetField, route || null);
+                        }
+
+                        if (this.streetNumberField) {
+                            $wire.set('data.' + this.streetNumberField, streetNumber || null);
                         }
 
                         // Update province - set null if API returns no data
