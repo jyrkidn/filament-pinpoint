@@ -2,6 +2,31 @@
 
 All notable changes to `filament-pinpoint` will be documented in this file.
 
+## v1.1.2 - 2025-12-19
+
+### Fixed
+
+- 🔧 **Environment variables now properly override default map settings** (#5)
+  - Default properties (`defaultLat`, `defaultLng`, `defaultZoom`, `height`) changed from hardcoded values to `null`
+  - Config values from `.env` are now used when `defaultLocation()` is not explicitly called
+  - Added `GOOGLE_MAPS_DEFAULT_HEIGHT` environment variable support
+
+- 🔄 **Repeater field compatibility** (#6)
+  - Added `getFieldPath()` function to calculate correct field paths for Repeater items
+  - Fixed field updates not working inside Repeater (was using `data.latitude` instead of `data.items.0.latitude`)
+  - Added `loadExistingCoordinates()` to properly load saved lat/lng values when editing Repeater items
+  - Map now correctly displays saved location when editing (instead of default location)
+
+### Changed
+
+- Updated all `$wire.set()` calls to use dynamic path calculation
+- Improved state hydration for nested form structures
+
+### Contributors
+
+- Thanks to [@dmitrijsmihailovs](https://github.com/dmitrijsmihailovs) for reporting #5
+- Thanks to [@nicollassilva](https://github.com/nicollassilva) for reporting #6
+
 ## v1.1.1 - 2025-12-15
 
 ### Added

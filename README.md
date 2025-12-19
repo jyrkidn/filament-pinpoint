@@ -65,9 +65,19 @@ return [
         'lat' => env('GOOGLE_MAPS_DEFAULT_LAT', -0.5050),
         'lng' => env('GOOGLE_MAPS_DEFAULT_LNG', 117.1500),
         'zoom' => env('GOOGLE_MAPS_DEFAULT_ZOOM', 13),
-        'height' => 400,
+        'height' => env('GOOGLE_MAPS_DEFAULT_HEIGHT', 400),
     ],
 ];
+```
+
+You can also set default values via environment variables:
+
+```env
+GOOGLE_MAPS_API_KEY=your_api_key_here
+GOOGLE_MAPS_DEFAULT_LAT=-6.200000
+GOOGLE_MAPS_DEFAULT_LNG=106.816666
+GOOGLE_MAPS_DEFAULT_ZOOM=15
+GOOGLE_MAPS_DEFAULT_HEIGHT=500
 ```
 
 ## Usage
@@ -129,6 +139,49 @@ Pinpoint::make('location')
     ->draggable(false)  // Disable marker dragging
     ->searchable(false) // Hide search box
 ```
+
+### Using with Repeater
+
+Pinpoint fully supports Filament's Repeater component. Each repeater item gets its own independent map and fields:
+
+```php
+use Fahiem\FilamentPinpoint\Pinpoint;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\TextInput;
+
+Repeater::make('branches')
+    ->schema([
+        TextInput::make('branch_name')
+            ->label('Branch Name')
+            ->required(),
+
+        Pinpoint::make('location')
+            ->label('Location')
+            ->latField('latitude')
+            ->lngField('longitude')
+            ->addressField('address')
+            ->draggable()
+            ->searchable()
+            ->height(300),
+
+        TextInput::make('latitude')
+            ->label('Latitude')
+            ->readOnly(),
+
+        TextInput::make('longitude')
+            ->label('Longitude')
+            ->readOnly(),
+
+        TextInput::make('address')
+            ->label('Address')
+            ->readOnly()
+            ->columnSpanFull(),
+    ])
+    ->columns(2)
+    ->columnSpanFull()
+```
+
+> **Note:** When using with Repeater, the field paths are automatically calculated (e.g., `data.branches.0.latitude` for the first item).
 
 ### Infolist Entry (Read-Only Display)
 
