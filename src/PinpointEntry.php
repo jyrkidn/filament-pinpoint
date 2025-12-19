@@ -24,13 +24,13 @@ class PinpointEntry extends Entry
 {
     protected string $view = 'filament-pinpoint::pinpoint-entry';
 
-    protected float|Closure $defaultLat = -0.5050;
+    protected float|Closure|null $defaultLat = null;
 
-    protected float|Closure $defaultLng = 117.1500;
+    protected float|Closure|null $defaultLng = null;
 
-    protected int|Closure $defaultZoom = 13;
+    protected int|Closure|null $defaultZoom = null;
 
-    protected int|Closure $height = 400;
+    protected int|Closure|null $height = null;
 
     protected string|Closure|null $latField = 'lat';
 

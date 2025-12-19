@@ -28,6 +28,6 @@ return [
         'lat' => env('GOOGLE_MAPS_DEFAULT_LAT', -0.5050),
         'lng' => env('GOOGLE_MAPS_DEFAULT_LNG', 117.1500),
         'zoom' => env('GOOGLE_MAPS_DEFAULT_ZOOM', 13),
-        'height' => 400,
+        'height' => env('GOOGLE_MAPS_DEFAULT_HEIGHT', 400),
     ],
 ];
