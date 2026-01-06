@@ -2,6 +2,41 @@
 
 All notable changes to `filament-pinpoint` will be documented in this file.
 
+## v1.1.3 - 2026-01-06
+
+### Added
+
+- ✨ **Multi-pin support for PinpointEntry** - Display multiple markers on a single map in infolist view
+  - New `pins()` method to set array of multiple markers with coordinates
+  - Each pin supports optional `label` for marker title
+  - Each pin supports optional `color` (8 predefined colors: red, blue, green, yellow, purple, pink, orange, ltblue)
+  - Each pin supports optional `icon` for custom marker icon URL
+  - Each pin supports optional `info` for custom HTML info window content
+  - Info windows appear on marker click
+- 🎯 **Auto-fit bounds** - Map automatically zooms to show all markers
+  - New `fitBounds()` method to enable/disable auto-fit behavior
+  - When enabled, map viewport adjusts to display all pins
+  - Single pin displays at default zoom level
+- 📍 **"Use my location" button** - New GPS location button for Pinpoint form field
+  - Uses browser's Geolocation API to get current device location
+  - Auto-fills coordinates and reverse geocodes address
+  - Clean grayscale design that works with any theme
+  - Smooth hover and active states
+  - Full dark mode support
+
+### Fixed
+
+- 🐛 Fixed "Use my location" button positioning issues in form field
+  - Button no longer appears outside form container
+  - Proper RTL (Right-to-Left) layout support
+  - Consistent styling across different themes
+
+### Changed
+
+- 🎨 Improved map container overflow handling with `overflow: clip` for stricter clipping
+- 🔄 Refactored PinpointEntry to support both single marker and multiple markers
+- 💅 Enhanced button styling with better accessibility (focus states, active states)
+
 ## v1.1.2 - 2025-12-19
 
 ### Fixed

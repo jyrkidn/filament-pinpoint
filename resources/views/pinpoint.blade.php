@@ -408,8 +408,10 @@
             </div>
         @endif
 
+       
+
         {{-- Map Container --}}
-        <div class="relative rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+        <div class="relative rounded-lg border border-gray-300 dark:border-gray-700" style="overflow: clip;">
             <div
                 x-ref="map"
                 style="height: {{ $height }}px; width: 100%;"
@@ -425,23 +427,8 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Get Current Location Button --}}
-            <button
-                type="button"
-                x-on:click="getCurrentLocation()"
-                x-show="isMapLoaded"
-                style="position: absolute; bottom: 75px; right: 10px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 10px; border: none; cursor: pointer;"
-                class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                title="{{ __('filament-pinpoint::pinpoint.use_my_location') }}"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 21px;" class="text-primary-600 dark:text-primary-400">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                </svg>
-            </button>
         </div>
-
+ 
         {{-- Helper Text --}}
         @if ($isDraggable)
             <p style="font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 6px;" class="text-gray-500 dark:text-gray-400">
@@ -451,6 +438,20 @@
                 <span>{{ __('filament-pinpoint::pinpoint.instructions') }}</span>
             </p>
         @endif
+        {{-- Get Current Location Button --}}
+        <button
+            type="button"
+            x-show="isMapLoaded"
+            @click="getCurrentLocation()"
+            class="pinpoint-location-btn"
+            title="{{ __('filament-pinpoint::pinpoint.use_my_location') }}"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px; flex-shrink: 0;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg>
+            <span>{{ __('filament-pinpoint::pinpoint.use_my_location') }}</span>
+        </button>
 
     </div>
 
@@ -458,6 +459,55 @@
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        /* Use My Location Button - Clean B&W Design */
+        .pinpoint-location-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 8px 14px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+            color: #374151; /* gray-700 */
+            background-color: #ffffff; /* white */
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .pinpoint-location-btn:hover {
+            background-color: #f3f4f6; /* gray-100 */
+            border-color: #9ca3af; /* gray-400 */
+            color: #111827; /* gray-900 */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .pinpoint-location-btn:active {
+            transform: scale(0.98);
+            background-color: #e5e7eb; /* gray-200 */
+        }
+
+        .pinpoint-location-btn:focus {
+            outline: 2px solid #6b7280; /* gray-500 */
+            outline-offset: 2px;
+        }
+
+        /* Dark mode support */
+        .dark .pinpoint-location-btn {
+            color: #e5e7eb; /* gray-200 */
+            background-color: #374151; /* gray-700 */
+            border-color: #4b5563; /* gray-600 */
+        }
+
+        .dark .pinpoint-location-btn:hover {
+            background-color: #4b5563; /* gray-600 */
+            border-color: #6b7280; /* gray-500 */
+            color: #f9fafb; /* gray-50 */
         }
     </style>
 </x-dynamic-component>

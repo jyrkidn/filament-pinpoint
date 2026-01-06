@@ -187,6 +187,8 @@ Repeater::make('branches')
 
 For displaying locations in infolists (view mode), use the `PinpointEntry` component. It displays a clean, read-only Google Map with a marker at the specified coordinates.
 
+#### Single Marker
+
 ```php
 use Fahiem\FilamentPinpoint\PinpointEntry;
 
@@ -203,6 +205,72 @@ public static function infolist(Infolist $infolist): Infolist
 }
 ```
 
+#### Multiple Markers (New in v1.1.3)
+
+Display multiple locations on a single map:
+
+```php
+PinpointEntry::make('branches')
+    ->label('Branch Locations')
+    ->pins([
+        [
+            'lat' => -6.200000,
+            'lng' => 106.816666,
+            'label' => 'Jakarta Office',
+            'color' => 'red',
+        ],
+        [
+            'lat' => -6.914744,
+            'lng' => 107.609810,
+            'label' => 'Bandung Office',
+            'color' => 'blue',
+        ],
+        [
+            'lat' => -7.797068,
+            'lng' => 110.370529,
+            'label' => 'Yogyakarta Office',
+            'color' => 'green',
+        ],
+    ])
+    ->fitBounds() // Auto-zoom to show all markers
+    ->height(500)
+    ->columnSpanFull()
+```
+
+#### Pin Customization Options
+
+Each pin in the `pins()` array supports:
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `lat` | `float` | **Required**. Latitude coordinate |
+| `lng` | `float` | **Required**. Longitude coordinate |
+| `label` | `string` | Optional. Marker title (shows on hover and in info window) |
+| `color` | `string` | Optional. Predefined color: `red`, `blue`, `green`, `yellow`, `purple`, `pink`, `orange`, `ltblue` |
+| `icon` | `string` | Optional. Custom marker icon URL (overrides `color`) |
+| `info` | `string` | Optional. Custom HTML content for info window (overrides default label) |
+
+#### Custom Marker Icons
+
+```php
+PinpointEntry::make('locations')
+    ->pins([
+        [
+            'lat' => -6.200000,
+            'lng' => 106.816666,
+            'label' => 'Main Office',
+            'icon' => 'https://example.com/custom-marker.png', // Custom icon URL
+        ],
+        [
+            'lat' => -6.914744,
+            'lng' => 107.609810,
+            'label' => 'Warehouse',
+            'info' => '<div style="padding: 10px;"><strong>Warehouse A</strong><br>Open 24/7</div>', // Custom HTML
+        ],
+    ])
+    ->columnSpanFull()
+```
+
 #### Customization Options
 
 ```php
@@ -213,12 +281,14 @@ PinpointEntry::make('location')
     ->height(400)
     ->latField('lat')
     ->lngField('lng')
+    ->fitBounds(false) // Disable auto-fit bounds
     ->columnSpanFull()
 ```
 
 The `PinpointEntry` displays:
-- A read-only Google Map with a marker at the specified coordinates
-- No text or address information - just a clean map view
+- A read-only Google Map with single or multiple markers
+- Optional info windows with labels or custom HTML content
+- Auto-fit bounds to display all markers
 - Full dark mode support
 
 
@@ -253,8 +323,12 @@ The `PinpointEntry` displays:
 | `height(int $height)` | Set map height in pixels | `400` |
 | `latField(string $field)` | Field name for latitude | `'lat'` |
 | `lngField(string $field)` | Field name for longitude | `'lng'` |
+| `pins(array $pins)` | Set array of multiple markers with lat, lng, label, color, icon, info | `null` |
+| `fitBounds(bool $fit)` | Auto-zoom map to show all markers | `true` |
 | `getLat()` | Get latitude from record | Returns field value or default |
 | `getLng()` | Get longitude from record | Returns field value or default |
+| `getPins()` | Get pins array | Returns pins or null |
+| `hasPins()` | Check if pins are set | Returns boolean |
 
 
 ## Getting a Google Maps API Key

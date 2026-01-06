@@ -36,6 +36,10 @@ class PinpointEntry extends Entry
 
     protected string|Closure|null $lngField = 'lng';
 
+    protected array|Closure|null $pins = null;
+
+    protected bool|Closure $fitBounds = true;
+
     public function defaultLocation(float $lat, float $lng): static
     {
         $this->defaultLat = $lat;
@@ -100,6 +104,37 @@ class PinpointEntry extends Entry
     public function getLngField(): ?string
     {
         return $this->evaluate($this->lngField);
+    }
+
+    public function pins(array|Closure $pins): static
+    {
+        $this->pins = $pins;
+
+        return $this;
+    }
+
+    public function fitBounds(bool|Closure $fit = true): static
+    {
+        $this->fitBounds = $fit;
+
+        return $this;
+    }
+
+    public function getPins(): ?array
+    {
+        return $this->evaluate($this->pins);
+    }
+
+    public function hasPins(): bool
+    {
+        $pins = $this->getPins();
+
+        return is_array($pins) && count($pins) > 0;
+    }
+
+    public function getFitBounds(): bool
+    {
+        return $this->evaluate($this->fitBounds);
     }
 
     public function getLat(): ?float
