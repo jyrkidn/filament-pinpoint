@@ -51,6 +51,7 @@
             defaultZoom: @js($defaultZoom),
             isDraggable: @js($isDraggable),
             isSearchable: @js($isSearchable),
+            statePath: @js($statePath),
             latField: @js($latField),
             lngField: @js($lngField),
             addressField: @js($addressField),
@@ -65,8 +66,41 @@
             villageField: @js($villageField),
             isMapLoaded: false,
 
+            getFieldPath(fieldName) {
+                if (!fieldName) return null;
+                // Get parent path from statePath (e.g., 'data.items.0.location' -> 'data.items.0')
+                const lastDotIndex = this.statePath.lastIndexOf('.');
+                const basePath = lastDotIndex > -1 ? this.statePath.substring(0, lastDotIndex + 1) : 'data.';
+                return basePath + fieldName;
+            },
+
             init() {
+                // Try to read existing lat/lng from sibling fields (for edit mode / Repeater support)
+                this.loadExistingCoordinates();
                 this.loadGoogleMaps();
+            },
+
+            loadExistingCoordinates() {
+                const latPath = this.getFieldPath(this.latField);
+                const lngPath = this.getFieldPath(this.lngField);
+                const addressPath = this.getFieldPath(this.addressField);
+
+                if (latPath && lngPath) {
+                    const existingLat = $wire.get(latPath);
+                    const existingLng = $wire.get(lngPath);
+
+                    if (existingLat && existingLng) {
+                        this.lat = parseFloat(existingLat);
+                        this.lng = parseFloat(existingLng);
+                    }
+                }
+
+                if (addressPath) {
+                    const existingAddress = $wire.get(addressPath);
+                    if (existingAddress) {
+                        this.address = existingAddress;
+                    }
+                }
             },
 
             loadGoogleMaps() {
@@ -172,12 +206,15 @@
                 this.lat = parseFloat(lat.toFixed(7));
                 this.lng = parseFloat(lng.toFixed(7));
 
-                // Set ke form data Filament (data.fieldName)
-                if (this.latField) {
-                    $wire.set('data.' + this.latField, this.lat);
+                // Set ke form data Filament using dynamic path (supports Repeater)
+                const latPath = this.getFieldPath(this.latField);
+                const lngPath = this.getFieldPath(this.lngField);
+
+                if (latPath) {
+                    $wire.set(latPath, this.lat);
                 }
-                if (this.lngField) {
-                    $wire.set('data.' + this.lngField, this.lng);
+                if (lngPath) {
+                    $wire.set(lngPath, this.lng);
                 }
 
                 // Reverse geocoding to get address
@@ -195,9 +232,10 @@
                         // Update address variable (for x-model)
                         this.address = address;
 
-                        // Update field address if set
-                        if (this.addressField) {
-                            $wire.set('data.' + this.addressField, address);
+                        // Update field address if set (supports Repeater)
+                        const addressPath = this.getFieldPath(this.addressField);
+                        if (addressPath) {
+                            $wire.set(addressPath, address);
                         }
 
                         // Extract address components
@@ -282,47 +320,56 @@
                             shortAddress += streetNumber;
                         }
 
-                        // Update short address
-                        if (this.shortAddressField) {
-                            $wire.set('data.' + this.shortAddressField, shortAddress || null);
+                        // Update short address (supports Repeater)
+                        const shortAddressPath = this.getFieldPath(this.shortAddressField);
+                        if (shortAddressPath) {
+                            $wire.set(shortAddressPath, shortAddress || null);
                         }
 
-                        if (this.streetField) {
-                            $wire.set('data.' + this.streetField, route || null);
+                        const streetPath = this.getFieldPath(this.streetField);
+                        if (streetPath) {
+                            $wire.set(streetPath, route || null);
                         }
 
+                        const streetNumberPath = this.getFieldPath(this.streetNumberField);
                         if (this.streetNumberField) {
-                            $wire.set('data.' + this.streetNumberField, streetNumber || null);
+                            $wire.set(streetNumberPath, streetNumber || null);
                         }
 
-                        // Update province - set null if API returns no data
-                        if (this.provinceField) {
-                            $wire.set('data.' + this.provinceField, province || null);
+                        // Update province (supports Repeater)
+                        const provincePath = this.getFieldPath(this.provinceField);
+                        if (provincePath) {
+                            $wire.set(provincePath, province || null);
                         }
 
-                        // Update city - set null if API returns no data
-                        if (this.cityField) {
-                            $wire.set('data.' + this.cityField, city || null);
+                        // Update city (supports Repeater)
+                        const cityPath = this.getFieldPath(this.cityField);
+                        if (cityPath) {
+                            $wire.set(cityPath, city || null);
                         }
 
-                        // Update district - set null if API returns no data
-                        if (this.districtField) {
-                            $wire.set('data.' + this.districtField, district || null);
+                        // Update district (supports Repeater)
+                        const districtPath = this.getFieldPath(this.districtField);
+                        if (districtPath) {
+                            $wire.set(districtPath, district || null);
                         }
 
-                        // Update village - set null if API returns no data
-                        if (this.villageField) {
-                            $wire.set('data.' + this.villageField, village || null);
+                        // Update village (supports Repeater)
+                        const villagePath = this.getFieldPath(this.villageField);
+                        if (villagePath) {
+                            $wire.set(villagePath, village || null);
                         }
 
-                        // Update postalCode - set null if API returns no data
-                        if (this.postalCodeField) {
-                            $wire.set('data.' + this.postalCodeField, postalCode || null);
+                        // Update postalCode (supports Repeater)
+                        const postalCodePath = this.getFieldPath(this.postalCodeField);
+                        if (postalCodePath) {
+                            $wire.set(postalCodePath, postalCode || null);
                         }
 
-                        // Update country - set null if API returns no data
-                        if (this.countryField) {
-                            $wire.set('data.' + this.countryField, country || null);
+                        // Update country (supports Repeater)
+                        const countryPath = this.getFieldPath(this.countryField);
+                        if (countryPath) {
+                            $wire.set(countryPath, country || null);
                         }
                     }
                 });
@@ -375,8 +422,10 @@
             </div>
         @endif
 
+
+
         {{-- Map Container --}}
-        <div class="relative rounded-lg overflow-hidden border border-gray-300 dark:border-gray-700">
+        <div class="relative rounded-lg border border-gray-300 dark:border-gray-700" style="overflow: clip;">
             <div
                 x-ref="map"
                 style="height: {{ $height }}px; width: 100%;"
@@ -392,21 +441,6 @@
                     </div>
                 </div>
             </div>
-
-            {{-- Get Current Location Button --}}
-            <button
-                type="button"
-                x-on:click="getCurrentLocation()"
-                x-show="isMapLoaded"
-                style="position: absolute; bottom: 75px; right: 10px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 10px; border: none; cursor: pointer;"
-                class="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                title="{{ __('filament-pinpoint::pinpoint.use_my_location') }}"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 21px;" class="text-primary-600 dark:text-primary-400">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                </svg>
-            </button>
         </div>
 
         {{-- Helper Text --}}
@@ -418,6 +452,20 @@
                 <span>{{ __('filament-pinpoint::pinpoint.instructions') }}</span>
             </p>
         @endif
+        {{-- Get Current Location Button --}}
+        <button
+            type="button"
+            x-show="isMapLoaded"
+            @click="getCurrentLocation()"
+            class="pinpoint-location-btn"
+            title="{{ __('filament-pinpoint::pinpoint.use_my_location') }}"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" style="width: 14px; height: 14px; flex-shrink: 0;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg>
+            <span>{{ __('filament-pinpoint::pinpoint.use_my_location') }}</span>
+        </button>
 
     </div>
 
@@ -425,6 +473,55 @@
         @keyframes spin {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+        }
+
+        /* Use My Location Button - Clean B&W Design */
+        .pinpoint-location-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 8px 14px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+            color: #374151; /* gray-700 */
+            background-color: #ffffff; /* white */
+            border: 1px solid #d1d5db; /* gray-300 */
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .pinpoint-location-btn:hover {
+            background-color: #f3f4f6; /* gray-100 */
+            border-color: #9ca3af; /* gray-400 */
+            color: #111827; /* gray-900 */
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .pinpoint-location-btn:active {
+            transform: scale(0.98);
+            background-color: #e5e7eb; /* gray-200 */
+        }
+
+        .pinpoint-location-btn:focus {
+            outline: 2px solid #6b7280; /* gray-500 */
+            outline-offset: 2px;
+        }
+
+        /* Dark mode support */
+        .dark .pinpoint-location-btn {
+            color: #e5e7eb; /* gray-200 */
+            background-color: #374151; /* gray-700 */
+            border-color: #4b5563; /* gray-600 */
+        }
+
+        .dark .pinpoint-location-btn:hover {
+            background-color: #4b5563; /* gray-600 */
+            border-color: #6b7280; /* gray-500 */
+            color: #f9fafb; /* gray-50 */
         }
     </style>
 </x-dynamic-component>
